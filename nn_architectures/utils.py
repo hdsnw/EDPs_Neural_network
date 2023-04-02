@@ -79,3 +79,38 @@ def plot_solucao_erro_l2(net, sol_eq, a, b):
     ax.set_title('Erro L2')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
+
+def dy(model, x, y, h=0.001):
+    # d = torch.autograd.grad(model(x, t), (x, t), grad_outputs=torch.ones_like(
+    #    model(x, t)), create_graph=True, retain_graph=True)
+    # return d[1]
+    inp = torch.cat([x.unsqueeze(0), y.unsqueeze(0)]).T
+    y = y+h
+    inp_h = torch.cat([x.unsqueeze(0), y.unsqueeze(0)]).T
+    return (model(inp_h) - model(inp))/h
+
+
+def dyy(model, x, y, h=0.001):
+    y_plus_h = torch.cat([x.unsqueeze(0), (y + h).unsqueeze(0)]).T
+    y_minus_h = torch.cat([x.unsqueeze(0), (y - h).unsqueeze(0)]).T
+    inp = torch.cat([x.unsqueeze(0), y.unsqueeze(0)]).T
+
+    return (model(y_plus_h) - 2*model(inp) + model(y_minus_h))/h**2
+
+
+def dx(model, x, y, h=0.001):
+    inp = torch.cat([x.unsqueeze(0), y.unsqueeze(0)]).T
+    x = x+h
+    inp_h = torch.cat([x.unsqueeze(0), y.unsqueeze(0)]).T
+
+    return (model(inp_h) - model(inp))/h
+
+
+def dxx(model, x, y, h=0.001):
+    x_plus_h = x + h
+    x_1 = torch.cat([x_plus_h.unsqueeze(0), y.unsqueeze(0)]).T
+    x_minus_h = x - h
+    x_3 = torch.cat([x_minus_h.unsqueeze(0), y.unsqueeze(0)]).T
+    x_2 = torch.cat([x.unsqueeze(0), y.unsqueeze(0)]).T
+
+    return (model(x_1) - 2*model(x_2) + model(x_3))/h**2
