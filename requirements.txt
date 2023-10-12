@@ -7,3 +7,6 @@ torchmetrics
 mypy
 flake8
 optuna
+torch
+plotly
+torchviz
